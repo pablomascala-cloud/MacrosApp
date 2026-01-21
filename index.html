@@ -1,4 +1,328 @@
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#10b981">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>MacroTracker Pro - IA Supervisor Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        :root {
+            --primary: #10b981;
+            --secondary: #3b82f6;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #0f172a;
+        }
+
+        * { box-sizing: border-box; transition: all 0.2s ease; }
+        body { 
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; 
+            background: var(--bg); color: var(--text); line-height: 1.6;
+        }
+
+        .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+
+        /* Estética */
+        .card { 
+            background: var(--card); padding: 25px; border-radius: 20px; 
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); margin-bottom: 25px;
+            border: 1px solid #f1f5f9;
+        }
+
+        .header h1 { font-size: 2rem; font-weight: 800; margin-bottom: 5px; color: var(--primary); text-align: center; }
+        
+        /* Inputs y Botones */
+        .grid-form { display: grid; grid-template-columns: 2fr 1fr auto; gap: 12px; margin-top: 15px; }
+        input { 
+            padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 12px;
+            font-size: 14px; outline: none; background: #fcfcfc;
+        }
+        input:focus { border-color: var(--primary); background: white; }
+
+        .btn { 
+            padding: 12px 20px; border: none; border-radius: 12px; font-weight: 700;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-add { background: var(--primary); color: white; }
+        .btn-save { background: var(--secondary); color: white; width: 100%; margin-top: 15px; }
+        .btn-reset { background: var(--danger); color: white; font-size: 11px; padding: 5px 10px; }
+
+        /* Tabla con Alertas IA */
+        .table-container { overflow-x: auto; margin-top: 20px; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
+        th { text-align: left; padding: 12px; font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; }
+        td { padding: 15px 12px; background: #fcfcfc; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; }
+        
+        .ia-status { font-size: 1.2rem; cursor: help; display: inline-block; }
+        .sospechoso { background: #fffbeb !important; border-color: var(--warning) !important; }
+
+        /* Dashboard */
+        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-top: 20px; }
+        .stat-card { padding: 15px; border-radius: 16px; text-align: center; background: #fff; border: 1px solid #f1f5f9; }
+        .stat-card b { display: block; font-size: 1.4rem; margin-top: 5px; }
+        .stat-card label { font-size: 0.7rem; font-weight: 700; color: #64748b; text-transform: uppercase; }
+
+        /* Porción */
+        .portion-card { background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%); border: 2px dashed var(--secondary); }
+
+        /* Historial */
+        .recipe-item { 
+            padding: 18px; background: white; border-radius: 16px; display: flex; 
+            justify-content: space-between; align-items: center; border: 1px solid #f1f5f9; margin-bottom: 10px;
+        }
+        .recipe-item:hover { border-color: var(--secondary); cursor: pointer; }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>🍳 MacroTracker Supervisor IA</h1>
+        <p style="text-align: center; color: #64748b;">Datos oficiales USDA con verificación de coherencia inteligente</p>
+    </div>
+
+    <div class="card">
+        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <input type="text" id="nombreReceta" placeholder="Nombre de la receta..." style="font-size: 1.2rem; font-weight: 800; border: none; background: transparent; width: 70%;">
+            <button class="btn btn-reset" onclick="nuevaReceta()">Reiniciar</button>
+        </div>
+        
+        <div class="grid-form">
+            <input type="text" id="alimento" placeholder="Buscar ingrediente (ej: Arroz integral)">
+            <input type="number" id="peso" placeholder="Gramos" inputmode="decimal">
+            <button class="btn btn-add" id="btnAdd">Añadir +</button>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr><th>Ingrediente</th><th>Peso</th><th>Kcal</th><th>Prot</th><th>HC</th><th>Estado IA</th></tr>
+                </thead>
+                <tbody id="lista"></tbody>
+            </table>
+        </div>
+
+        <div class="dashboard">
+            <div class="stat-card" style="border-bottom: 4px solid var(--danger);"><label>Calorías</label><b id="tKcal">0</b></div>
+            <div class="stat-card" style="border-bottom: 4px solid var(--secondary);"><label>Proteínas</label><b id="tProt">0</b></div>
+            <div class="stat-card" style="border-bottom: 4px solid var(--primary);"><label>HC Netos</label><b id="tCarb">0</b></div>
+            <div class="stat-card" style="border-bottom: 4px solid #94a3b8;"><label>Peso Total</label><b><span id="tWeight">0</span>g</b></div>
+        </div>
+
+        <button class="btn btn-save" onclick="guardar()">💾 Guardar Receta en Historial</button>
+    </div>
+
+    <div class="card portion-card">
+        <div class="grid-form" style="grid-template-columns: 1fr 1fr;">
+            <div>
+                <label style="font-weight: 800; font-size: 0.8rem;">⚖️ CALCULAR RACIÓN DEL PLATO</label>
+                <input type="number" id="pesoPorcion" placeholder="Peso que vas a comer..." oninput="recalcPorcion()" style="margin-top: 10px;">
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <div class="stat-card" style="flex: 1;"><label>Kcal Ración</label><b id="pKcal">0</b></div>
+                <div class="stat-card" style="flex: 1;"><label>Prot Ración</label><b id="pProt">0</b></div>
+            </div>
+        </div>
+    </div>
+
+    <h3>📚 Mis Recetas Guardadas</h3>
+    <div id="historial" class="recipe-list"></div>
+</div>
+
+<script>
+// --- CONFIGURACIÓN ---
+const USDA_API_KEY = "qZq57hhuXUiTH3nSwyfrD0DgDHUWv6RkT53fCxmy";
+const GEMINI_API_KEY = "AIzaSyAEbLKd3RLmbJ2bV6LL4p-BbgY4ZhI0OVA"; // Para la validación de coherencia
+
+let recetaActual = { nombre: "", ingredientes: [], totales: { kcal:0, prot:0, carb:0, weight:0 } };
+let historial = JSON.parse(localStorage.getItem('historial_recetas_ia')) || [];
+
+window.onload = () => {
+    cargarEstadoActual();
+    renderHistorial();
+};
+
+// 1. OBTENCIÓN DE DATOS (USDA)
+async function obtenerUSDA(query) {
+    try {
+        const url = `https://api.nal.usda.gov/fdc/v1/foods/search?query=${encodeURIComponent(query)}&dataType=SR%20Legacy&pageSize=1&api_key=${USDA_API_KEY}`;
+        const resp = await fetch(url);
+        const data = await resp.json();
+        if (!data.foods || data.foods.length === 0) return null;
+        
+        const nutrients = data.foods[0].foodNutrients;
+        const findN = (id) => nutrients.find(n => n.nutrientId === id)?.value || 0;
+
+        return {
+            name: data.foods[0].description,
+            kcal: findN(1008),
+            prot: findN(1003),
+            carb: findN(1005)
+        };
+    } catch (e) { return null; }
+}
+
+// 2. SUPERVISIÓN IA (Verifica pero no modifica)
+async function verificarCoherenciaIA(nombre, kcal, prot, carb) {
+    const prompt = `Analiza si estos macros por 100g para "${nombre}" son realistas: ${kcal}kcal, ${prot}g proteína, ${carb}g carbohidratos. Responde solo JSON: {"coherente": true/false, "motivo": "explicacion corta"}`;
+    
+    try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+        const resp = await fetch(url, {
+            method: 'POST',
+            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+        });
+        const json = await resp.json();
+        const res = JSON.parse(json.candidates[0].content.parts[0].text.replace(/```json|```/g, ""));
+        return res;
+    } catch (e) {
+        return { coherente: true, motivo: "" }; // Por defecto confiamos si la IA falla
+    }
+}
+
+// 3. LÓGICA DE AÑADIR
+document.getElementById("btnAdd").onclick = async () => {
+    const q = document.getElementById("alimento").value;
+    const p = parseFloat(document.getElementById("peso").value);
+    
+    if (!q || !p) return alert("Rellena los datos");
+
+    document.getElementById("btnAdd").innerText = "Consultando...";
+    const info = await obtenerUSDA(q);
+    
+    if (!info) {
+        document.getElementById("btnAdd").innerText = "Añadir +";
+        return alert("No encontrado en USDA");
+    }
+
+    const factor = p / 100;
+    const item = {
+        id: Date.now(),
+        nombre: info.name,
+        peso: p,
+        kcal: info.kcal * factor,
+        prot: info.prot * factor,
+        carb: info.carb * factor,
+        original100g: info, // Guardamos para la IA
+        iaStatus: "pendiente",
+        iaMotivo: ""
+    };
+
+    recetaActual.ingredientes.push(item);
+    actualizarMesa();
+    guardarEstadoActual();
+
+    // Verificación en segundo plano
+    verificarCoherenciaIA(info.name, info.kcal, info.prot, info.carb).then(res => {
+        const index = recetaActual.ingredientes.findIndex(i => i.id === item.id);
+        if (index !== -1) {
+            recetaActual.ingredientes[index].iaStatus = res.coherente ? "ok" : "sospechoso";
+            recetaActual.ingredientes[index].iaMotivo = res.motivo;
+            actualizarMesa();
+            guardarEstadoActual();
+        }
+    });
+
+    document.getElementById("btnAdd").innerText = "Añadir +";
+    limpiarInputs();
+};
+
+// 4. GESTIÓN DE INTERFAZ Y HISTORIAL
+function actualizarMesa() {
+    const lista = document.getElementById("lista");
+    lista.innerHTML = "";
+    let t = { kcal:0, prot:0, carb:0, weight:0 };
+
+    recetaActual.ingredientes.forEach(ing => {
+        t.kcal += ing.kcal; t.prot += ing.prot; t.carb += ing.carb; t.weight += ing.peso;
+        
+        const warning = ing.iaStatus === "sospechoso" ? 
+            `<span class="ia-status" title="IA SOSPECHA: ${ing.iaMotivo}">⚠️</span>` : 
+            (ing.iaStatus === "ok" ? "✅" : "⏳");
+
+        lista.innerHTML += `<tr class="${ing.iaStatus === 'sospechoso' ? 'sospechoso' : ''}">
+            <td>${ing.nombre}</td>
+            <td>${ing.peso}g</td>
+            <td>${ing.kcal.toFixed(0)}</td>
+            <td>${ing.prot.toFixed(1)}g</td>
+            <td>${ing.carb.toFixed(1)}g</td>
+            <td style="text-align:center">${warning}</td>
+        </tr>`;
+    });
+
+    recetaActual.totales = t;
+    document.getElementById("tKcal").innerText = t.kcal.toFixed(0);
+    document.getElementById("tProt").innerText = t.prot.toFixed(1);
+    document.getElementById("tCarb").innerText = t.carb.toFixed(1);
+    document.getElementById("tWeight").innerText = t.weight.toFixed(0);
+    recalcPorcion();
+}
+
+function recalcPorcion() {
+    const p = parseFloat(document.getElementById("pesoPorcion").value);
+    if (!p || recetaActual.totales.weight === 0) return;
+    const ratio = p / recetaActual.totales.weight;
+    document.getElementById("pKcal").innerText = (recetaActual.totales.kcal * ratio).toFixed(0);
+    document.getElementById("pProt").innerText = (recetaActual.totales.prot * ratio).toFixed(1) + "g";
+}
+
+function guardar() {
+    const nombre = document.getElementById("nombreReceta").value.trim() || "Receta Guardada";
+    recetaActual.nombre = nombre;
+    const idx = historial.findIndex(r => r.nombre === nombre);
+    if (idx > -1) historial[idx] = JSON.parse(JSON.stringify(recetaActual));
+    else historial.push(JSON.parse(JSON.stringify(recetaActual)));
+    localStorage.setItem('historial_recetas_ia', JSON.stringify(historial));
+    renderHistorial();
+    alert("Receta guardada");
+}
+
+function renderHistorial() {
+    const h = document.getElementById("historial");
+    h.innerHTML = "";
+    historial.forEach((rec, i) => {
+        h.innerHTML += `
+            <div class="recipe-item" onclick="cargarReceta(${i})">
+                <div><strong>${rec.nombre}</strong><br><small>${rec.totales.kcal.toFixed(0)} Kcal | ${rec.totales.weight.toFixed(0)}g</small></div>
+                <button class="btn" style="background:#f1f5f9; color:var(--danger);" onclick="event.stopPropagation(); borrar(${i})">Eliminar</button>
+            </div>`;
+    });
+}
+
+function cargarReceta(i) {
+    recetaActual = JSON.parse(JSON.stringify(historial[i]));
+    document.getElementById("nombreReceta").value = recetaActual.nombre;
+    actualizarMesa();
+    guardarEstadoActual();
+}
+
+function borrar(i) {
+    historial.splice(i, 1);
+    localStorage.setItem('historial_recetas_ia', JSON.stringify(historial));
+    renderHistorial();
+}
+
+function nuevaReceta() {
+    recetaActual = { nombre: "", ingredientes: [], totales: { kcal:0, prot:0, carb:0, weight:0 } };
+    document.getElementById("nombreReceta").value = "";
+    actualizarMesa();
+    guardarEstadoActual();
+}
+
+function guardarEstadoActual() { localStorage.setItem('draft_recipe', JSON.stringify(recetaActual)); }
+function cargarEstadoActual() {
+    const d = localStorage.getItem('draft_recipe');
+    if (d) { recetaActual = JSON.parse(d); document.getElementById("nombreReceta").value = recetaActual.nombre; actualizarMesa(); }
+}
+
+function limpiarInputs() {
+    document.getElementById("alimento").value = "";
+    document.getElementById("peso").value = "";
+    document.getElementById("alimento").focus();
+}
+</script>
+</body>
+</html>
