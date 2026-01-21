@@ -1,0 +1,15 @@
+{
+  "name": "MacroTracker Pro IA",
+  "short_name": "MacrosIA",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#10b981",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2424/2424520.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
