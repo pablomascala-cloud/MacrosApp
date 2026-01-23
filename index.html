@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>MacroTracker Pro - Full Edition</title>
+    <title>MacroTracker Pro IA - Editor</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -10,122 +10,103 @@
     <link rel="manifest" href="manifest.json">
 
     <style>
-        :root { --primary: #10b981; --secondary: #3b82f6; --fat: #f59e0b; --carb: #8b5cf6; --danger: #ef4444; --bg: #f8fafc; --text: #0f172a; }
-        * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
-        body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 40px; }
+        :root { --primary: #10b981; --secondary: #3b82f6; --danger: #ef4444; --warning: #f59e0b; --bg: #f8fafc; --text: #0f172a; }
+        * { box-sizing: border-box; font-family: system-ui, sans-serif; }
+        body { margin: 0; background: var(--bg); color: var(--text); }
         .container { max-width: 900px; margin: 20px auto; padding: 0 15px; }
         .card { background: #fff; padding: 25px; border-radius: 20px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #f1f5f9; }
-        h1 { color: var(--primary); text-align: center; margin: 0 0 15px 0; font-size: 1.6rem; }
-
-        /* Tabs y UI */
-        .tabs { display: flex; gap: 8px; margin-bottom: 15px; }
-        .tab-btn { flex: 1; padding: 10px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; background: #e2e8f0; color: #64748b; }
+        
+        /* Tabs */
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab-btn { flex: 1; padding: 12px; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; background: #e2e8f0; color: #64748b; }
         .tab-btn.active { background: var(--primary); color: white; }
 
-        .grid-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; }
-        .full { grid-column: 1 / -1; }
-        input { padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; outline: none; width: 100%; }
-        input:focus { border-color: var(--primary); }
-
-        .btn { padding: 12px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: white; }
+        /* Form */
+        .grid-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; }
+        input { padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 14px; outline: none; width: 100%; }
+        .btn { padding: 14px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; color: white; }
         .btn-add { background: var(--primary); width: 100%; margin-top: 10px; }
+        .btn-edit { background: var(--warning); color: #000; }
 
-        /* Dashboard de 4 Macros */
-        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-top: 15px; }
-        .stat { padding: 15px; border-radius: 14px; text-align: center; border: 1px solid #f1f5f9; background: #fff; }
-        .stat b { display: block; font-size: 1.2rem; margin-top: 4px; }
-        .stat label { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; color: #64748b; }
-
+        /* Tabla */
         .table-container { overflow-x: auto; margin-top: 20px; }
-        table { width: 100%; border-collapse: collapse; min-width: 500px; }
-        th { text-align: left; font-size: 0.7rem; color: #94a3b8; padding: 10px; text-transform: uppercase; }
-        td { padding: 10px; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; }
-
-        .portion-box { background: #f0f9ff; border: 2px dashed var(--secondary); padding: 20px; border-radius: 15px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; color: #94a3b8; font-size: 0.7rem; text-transform: uppercase; padding: 10px; }
+        td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+        
+        .action-btn { background: none; border: none; cursor: pointer; font-size: 1.1rem; padding: 5px; }
+        
+        .stat { padding: 15px; border-radius: 16px; text-align: center; background: #fff; border: 1px solid #f1f5f9; }
+        .stat b { display: block; font-size: 1.4rem; }
         .hidden { display: none; }
-        .recipe-item { padding: 15px; background: #fff; border-radius: 12px; margin-bottom: 8px; border: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="card">
-        <h1>🍽️ MacroTracker Pro</h1>
-        <input type="text" id="nombreReceta" placeholder="Nombre de la receta..." style="font-weight: 800; border: none; font-size: 1.3rem; margin-bottom: 15px; outline: none; width: 100%;">
+        <h1 style="color:var(--primary); text-align:center;">🍽️ MacroTracker Pro IA</h1>
+        <input type="text" id="nombreReceta" placeholder="Nombre de la receta..." style="font-weight: 800; border: none; font-size: 1.2rem; margin-bottom: 20px; width: 100%;">
         
         <div class="tabs">
             <button class="tab-btn active" id="tabUsda" onclick="setMode('usda')">🔍 Buscar</button>
-            <button class="tab-btn" id="tabManual" onclick="setMode('manual')">🏷️ Manual</button>
+            <button class="tab-btn" id="tabManual" onclick="setMode('manual')">🏷️ Manual/Editar</button>
         </div>
 
         <div id="formUsda" class="grid-form">
-            <input type="text" id="alimento" class="full" placeholder="Buscar ingrediente...">
+            <input type="text" id="alimento" style="grid-column: 1/-1" placeholder="Ej: Pechuga de pollo">
             <input type="number" id="peso" placeholder="Gramos" inputmode="decimal">
             <button class="btn btn-add" onclick="añadir('usda')">Añadir</button>
         </div>
 
         <div id="formManual" class="grid-form hidden">
-            <input type="text" id="mNombre" class="full" placeholder="Nombre producto">
-            <input type="number" id="mPeso" placeholder="Gramos">
-            <input type="number" id="mKcal" placeholder="Kcal / 100g">
-            <input type="number" id="mProt" placeholder="Prot / 100g">
-            <input type="number" id="mFat" placeholder="Grasa / 100g">
-            <input type="number" id="mHC" placeholder="HC / 100g">
-            <button class="btn btn-add" style="background:var(--secondary)" onclick="añadir('manual')">Añadir</button>
+            <input type="text" id="mNombre" style="grid-column: 1/-1" placeholder="Producto">
+            <input type="number" id="mPeso" placeholder="Peso (g)" inputmode="decimal">
+            <input type="number" id="mKcal" placeholder="Kcal / 100g" inputmode="decimal">
+            <input type="number" id="mProt" placeholder="Prot / 100g" inputmode="decimal">
+            <input type="number" id="mHC" placeholder="HC / 100g" inputmode="decimal">
+            <button id="btnConfirmarManual" class="btn btn-add" style="background:var(--secondary)" onclick="añadir('manual')">Añadir / Actualizar</button>
         </div>
 
         <div class="table-container">
             <table>
-                <thead><tr><th>Ingrediente</th><th>G</th><th>Kcal</th><th>P</th><th>G</th><th>HC</th><th>IA</th></tr></thead>
+                <thead><tr><th>Ingrediente</th><th>G</th><th>Kcal</th><th>Prot</th><th>IA</th><th>Acción</th></tr></thead>
                 <tbody id="lista"></tbody>
             </table>
         </div>
 
-        <div class="dashboard">
-            <div class="stat" style="border-bottom: 4px solid var(--danger);"><label>Kcal Totales</label><b id="tKcal">0</b></div>
-            <div class="stat" style="border-bottom: 4px solid var(--secondary);"><label>Proteínas</label><b id="tProt">0</b></div>
-            <div class="stat" style="border-bottom: 4px solid var(--fat);"><label>Grasas</label><b id="tFat">0</b></div>
-            <div class="stat" style="border-bottom: 4px solid var(--carb);"><label>Hidratos</label><b id="tHC">0</b></div>
-            <div class="stat" style="grid-column: 1 / -1;"><label>Peso Total de la Receta</label><b><span id="tWeight">0</span> g</b></div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px;">
+            <div class="stat"><label>Kcal</label><b id="tKcal">0</b></div>
+            <div class="stat"><label>Prot</label><b id="tProt">0</b></div>
+            <div class="stat"><label>Peso</label><b><span id="tWeight">0</span>g</b></div>
         </div>
-        
-        <button class="btn" style="background:var(--secondary); width:100%; margin-top:15px;" onclick="guardar()">💾 Guardar Receta</button>
+        <button class="btn" style="background:var(--secondary); width:100%; margin-top:20px" onclick="guardar()">💾 Guardar Receta</button>
     </div>
 
-    <div class="card portion-box">
-        <strong>⚖️ Cálculo Proporcional de la Ración</strong>
-        <div class="grid-form" style="margin-top: 15px;">
-            <input type="number" id="pesoPorcion" class="full" placeholder="¿Cuántos gramos vas a comer?" oninput="recalcPorcion()">
-        </div>
-        <div class="dashboard" style="margin-top: 15px;">
-            <div class="stat"><label>Kcal</label><b id="pKcal">0</b></div>
-            <div class="stat"><label>Prot</label><b id="pProt">0</b></div>
-            <div class="stat"><label>Grasa</label><b id="pFat">0</b></div>
-            <div class="stat"><label>HC</label><b id="pHC">0</b></div>
-        </div>
-    </div>
-
-    <h3>📚 Historial</h3>
     <div id="historial"></div>
 </div>
 
 <script>
-// --- CONFIGURACIÓN ---
 const USDA_KEY = "qZq57hhuXUiTH3nSwyfrD0DgDHUWv6RkT53fCxmy";
 const GEMINI_KEY = "AIzaSyAEbLKd3RLmbJ2bV6LL4p-BbgY4ZhI0OVA";
 
-let recetaActual = { nombre: "", ingredientes: [], totales: { kcal:0, prot:0, fat:0, hc:0, weight:0 } };
+let recetaActual = { nombre: "", ingredientes: [], totales: { kcal:0, prot:0, weight:0 } };
 let historial = JSON.parse(localStorage.getItem('historial_v6')) || [];
+let editIdx = -1; // Índice para saber si estamos editando un alimento
 
 function setMode(mode) {
     document.getElementById('formUsda').classList.toggle('hidden', mode !== 'usda');
     document.getElementById('formManual').classList.toggle('hidden', mode !== 'manual');
     document.getElementById('tabUsda').classList.toggle('active', mode === 'usda');
     document.getElementById('tabManual').classList.toggle('active', mode === 'manual');
+    if(mode === 'manual' && editIdx === -1) {
+        document.getElementById('btnConfirmarManual').innerText = "Añadir Manualmente";
+    }
 }
 
 async function añadir(tipo) {
     let nombre, peso, datos;
+
     if (tipo === 'usda') {
         nombre = document.getElementById("alimento").value;
         peso = parseFloat(document.getElementById("peso").value);
@@ -136,84 +117,111 @@ async function añadir(tipo) {
         nombre = document.getElementById("mNombre").value;
         peso = parseFloat(document.getElementById("mPeso").value);
         if (!nombre || !peso) return;
-        datos = { 
+        datos = {
             kcal: parseFloat(document.getElementById("mKcal").value) || 0,
             prot: parseFloat(document.getElementById("mProt").value) || 0,
-            fat: parseFloat(document.getElementById("mFat").value) || 0,
             hc: parseFloat(document.getElementById("mHC").value) || 0
         };
     }
 
-    const f = peso / 100;
     const item = {
-        id: Date.now(), nombre, peso,
-        kcal: datos.kcal * f, prot: datos.prot * f, fat: datos.fat * f, hc: datos.hc * f,
+        id: Date.now(),
+        nombre: nombre,
+        peso: peso,
+        kcal: datos.kcal * (peso/100),
+        prot: datos.prot * (peso/100),
+        base: datos, // Guardamos la base de 100g para futuras ediciones
         ia: "⏳"
     };
 
-    recetaActual.ingredientes.push(item);
+    if (editIdx > -1) {
+        recetaActual.ingredientes[editIdx] = item;
+        editIdx = -1;
+    } else {
+        recetaActual.ingredientes.push(item);
+    }
+
     actualizarInterfaz();
-    validarIA(item, datos);
-    document.querySelectorAll('input:not(#nombreReceta)').forEach(i => i.value = "");
+    limpiarForm();
+    validarIA(item);
+}
+
+function prepararEdicion(idx) {
+    const ing = recetaActual.ingredientes[idx];
+    editIdx = idx;
+    
+    // Rellenamos el formulario manual con los datos actuales
+    document.getElementById('mNombre').value = ing.nombre;
+    document.getElementById('mPeso').value = ing.peso;
+    document.getElementById('mKcal').value = (ing.base.kcal).toFixed(1);
+    document.getElementById('mProt').value = (ing.base.prot).toFixed(1);
+    document.getElementById('mHC').value = (ing.base.hc).toFixed(1);
+    
+    document.getElementById('btnConfirmarManual').innerText = "Actualizar Cambios";
+    setMode('manual');
+}
+
+function borrarIngrediente(idx) {
+    recetaActual.ingredientes.splice(idx, 1);
+    actualizarInterfaz();
 }
 
 async function buscarUSDA(q) {
     try {
-        const r = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${q}&dataType=SR%20Legacy&pageSize=1&api_key=${USDA_KEY}`);
+        const r = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${q}&pageSize=1&api_key=${USDA_KEY}`);
         const d = await r.json();
         const n = d.foods[0].foodNutrients;
         const get = id => n.find(x => x.nutrientId === id)?.value || 0;
-        return { kcal: get(1008), prot: get(1003), fat: get(1004), hc: get(1005) };
+        return { kcal: get(1008), prot: get(1003), hc: get(1005) };
     } catch { return null; }
 }
 
-async function validarIA(item, base) {
-    const prompt = `Valida macros por 100g para "${item.nombre}": ${base.kcal}kcal, ${base.prot}g prot, ${base.fat}g grasa, ${base.hc}g hidratos. Responde JSON: {"ok":true/false, "msg":"..."}`;
+async function validarIA(item) {
+    const prompt = `Valida macros por 100g de "${item.nombre}": ${item.base.kcal}kcal, ${item.base.prot}g prot. JSON: {"ok":true/false, "msg":"..."}`;
     try {
         const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`, {
             method: 'POST', body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
         });
         const j = await r.json();
         const res = JSON.parse(j.candidates[0].content.parts[0].text.replace(/```json|```/g, ""));
-        const idx = recetaActual.ingredientes.findIndex(i => i.id === item.id);
-        if (idx !== -1) { recetaActual.ingredientes[idx].ia = res.ok ? "✅" : "⚠️"; actualizarInterfaz(); }
+        const i = recetaActual.ingredientes.findIndex(x => x.id === item.id);
+        if(i > -1) {
+            recetaActual.ingredientes[i].ia = res.ok ? "✅" : `<span title="${res.msg}">⚠️</span>`;
+            actualizarInterfaz();
+        }
     } catch { 
-        const idx = recetaActual.ingredientes.findIndex(i => i.id === item.id);
-        if (idx !== -1) { recetaActual.ingredientes[idx].ia = "✅"; actualizarInterfaz(); }
+        const i = recetaActual.ingredientes.findIndex(x => x.id === item.id);
+        if(i > -1) { recetaActual.ingredientes[i].ia = "✅"; actualizarInterfaz(); }
     }
 }
 
 function actualizarInterfaz() {
     const lista = document.getElementById("lista");
     lista.innerHTML = "";
-    let tk=0, tp=0, tf=0, th=0, tw=0;
+    let tk=0, tp=0, tw=0;
 
-    recetaActual.ingredientes.forEach(ing => {
-        tk+=ing.kcal; tp+=ing.prot; tf+=ing.fat; th+=ing.hc; tw+=ing.peso;
-        lista.innerHTML += `<tr><td>${ing.nombre}</td><td>${ing.peso}g</td><td>${ing.kcal.toFixed(0)}</td><td>${ing.prot.toFixed(1)}</td><td>${ing.fat.toFixed(1)}</td><td>${ing.hc.toFixed(1)}</td><td>${ing.ia}</td></tr>`;
+    recetaActual.ingredientes.forEach((ing, i) => {
+        tk += ing.kcal; tp += ing.prot; tw += ing.peso;
+        lista.innerHTML += `<tr>
+            <td>${ing.nombre}</td>
+            <td>${ing.peso}</td>
+            <td>${ing.kcal.toFixed(0)}</td>
+            <td>${ing.prot.toFixed(1)}</td>
+            <td>${ing.ia}</td>
+            <td>
+                <button class="action-btn" onclick="prepararEdicion(${i})">✏️</button>
+                <button class="action-btn" onclick="borrarIngrediente(${i})">🗑️</button>
+            </td>
+        </tr>`;
     });
 
-    recetaActual.totales = { kcal:tk, prot:tp, fat:tf, hc:th, weight:tw };
     document.getElementById("tKcal").innerText = tk.toFixed(0);
     document.getElementById("tProt").innerText = tp.toFixed(1);
-    document.getElementById("tFat").innerText = tf.toFixed(1);
-    document.getElementById("tHC").innerText = th.toFixed(1);
     document.getElementById("tWeight").innerText = tw.toFixed(0);
-    recalcPorcion();
-}
-
-function recalcPorcion() {
-    const p = parseFloat(document.getElementById("pesoPorcion").value);
-    if (!p || recetaActual.totales.weight === 0) return;
-    const r = p / recetaActual.totales.weight;
-    document.getElementById("pKcal").innerText = (recetaActual.totales.kcal * r).toFixed(0);
-    document.getElementById("pProt").innerText = (recetaActual.totales.prot * r).toFixed(1);
-    document.getElementById("pFat").innerText = (recetaActual.totales.fat * r).toFixed(1);
-    document.getElementById("pHC").innerText = (recetaActual.totales.hc * r).toFixed(1);
 }
 
 function guardar() {
-    recetaActual.nombre = document.getElementById("nombreReceta").value || "Sin nombre";
+    recetaActual.nombre = document.getElementById("nombreReceta").value || "Receta";
     historial.push(JSON.parse(JSON.stringify(recetaActual)));
     localStorage.setItem('historial_v6', JSON.stringify(historial));
     renderHistorial();
@@ -223,25 +231,16 @@ function renderHistorial() {
     const h = document.getElementById("historial");
     h.innerHTML = "";
     historial.forEach((r, i) => {
-        h.innerHTML += `<div class="recipe-item" onclick="cargar(${i})">
-            <span><b>${r.nombre}</b> (${r.totales.kcal.toFixed(0)} kcal)</span>
-            <button onclick="event.stopPropagation(); borrar(${i})" style="border:none; background:none; cursor:pointer;">🗑️</button>
+        h.innerHTML += `<div class="card" onclick="cargar(${i})" style="cursor:pointer; display:flex; justify-content:space-between">
+            <span><b>${r.nombre}</b> - ${r.totales.kcal.toFixed(0)} kcal</span>
+            <button onclick="event.stopPropagation(); borrarH(${i})" style="border:none; background:none; cursor:pointer">❌</button>
         </div>`;
     });
 }
 
-function cargar(i) {
-    recetaActual = JSON.parse(JSON.stringify(historial[i]));
-    document.getElementById("nombreReceta").value = recetaActual.nombre;
-    actualizarInterfaz();
-}
-
-function borrar(i) {
-    historial.splice(i, 1);
-    localStorage.setItem('historial_v6', JSON.stringify(historial));
-    renderHistorial();
-}
-
+function cargar(i) { recetaActual = JSON.parse(JSON.stringify(historial[i])); document.getElementById("nombreReceta").value = recetaActual.nombre; actualizarInterfaz(); }
+function borrarH(i) { historial.splice(i,1); localStorage.setItem('historial_v6', JSON.stringify(historial)); renderHistorial(); }
+function limpiarForm() { document.querySelectorAll('input:not(#nombreReceta)').forEach(i => i.value = ""); editIdx = -1; }
 window.onload = renderHistorial;
 </script>
 </body>
