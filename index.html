@@ -18,7 +18,6 @@
         body { margin: 0; background: var(--bg); color: var(--text); line-height: 1.6; }
         .container { max-width: 1000px; margin: 20px auto; padding: 0 15px; }
         
-        /* Estética Refinada */
         .card { 
             background: var(--card); padding: 25px; border-radius: 20px; 
             box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); margin-bottom: 25px; 
@@ -26,7 +25,6 @@
         }
         h1 { color: var(--primary); text-align: center; font-weight: 800; margin: 0 0 10px 0; }
 
-        /* Tabs Logic */
         .tabs { display: flex; gap: 8px; margin-bottom: 15px; }
         .tab-btn { 
             flex: 1; padding: 10px; border: none; border-radius: 10px; 
@@ -34,7 +32,6 @@
         }
         .tab-btn.active { background: var(--primary); color: white; }
 
-        /* Formularios */
         .grid-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; }
         .full { grid-column: 1 / -1; }
         input { 
@@ -50,7 +47,6 @@
         .btn-add { background: var(--primary); width: 100%; margin-top: 10px; }
         .btn-save { background: var(--secondary); width: 100%; margin-top: 15px; }
 
-        /* Tabla y Acciones */
         .table-container { overflow-x: auto; margin-top: 20px; }
         table { width: 100%; border-collapse: separate; border-spacing: 0 5px; }
         th { text-align: left; padding: 10px; font-size: 0.7rem; text-transform: uppercase; color: #94a3b8; }
@@ -61,13 +57,16 @@
         .action-btn { background: none; border: none; cursor: pointer; font-size: 1.1rem; filter: grayscale(1); }
         .action-btn:hover { filter: grayscale(0); transform: scale(1.1); }
 
-        /* Dashboard */
-        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-top: 20px; }
+        .dashboard, .portion-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); 
+            gap: 10px; 
+            margin-top: 20px; 
+        }
         .stat-card { padding: 15px; border-radius: 16px; text-align: center; background: #fff; border: 1px solid #f1f5f9; }
         .stat-card b { display: block; font-size: 1.5rem; color: var(--text); }
         .stat-card label { font-size: 0.7rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; }
 
-        /* Micros y Porción */
         .micro-info { display: flex; justify-content: space-around; padding: 15px; background: #f8fafc; border-radius: 12px; margin-top: 15px; font-size: 0.85rem; }
         .portion-tool { background: #f0fdf4; border: 2px dashed var(--primary); }
 
@@ -80,7 +79,7 @@
 <div class="container">
     <div class="header" style="text-align: center; margin-bottom: 25px;">
         <h1>🛡️ MacroTracker Refined Pro</h1>
-        <p style="color: #64748b; font-size: 0.9rem;">Gestión científica con supervisión IA y edición avanzada</p>
+        <p style="color: #64748b; font-size: 0.9rem;">Gestión científica con supervisión IA y raciones detalladas</p>
     </div>
 
     <div class="card">
@@ -106,26 +105,26 @@
             <input type="number" id="mKcal" placeholder="Kcal/100g">
             <input type="number" id="mProt" placeholder="Prot/100g">
             <input type="number" id="mFat" placeholder="Grasa/100g">
-            <input type="number" id="mCarb" placeholder="HC/100g">
+            <input type="number" id="mHC" placeholder="HC/100g">
             <input type="number" id="mFiber" placeholder="Fibra/100g">
             <input type="number" id="mSodium" placeholder="Sodio/100g">
-            <button id="btnConfirmManual" class="btn btn-add" style="background:var(--secondary)" onclick="añadirIngrediente('manual')">Actualizar / Añadir</button>
+            <button id="btnConfirmManual" class="btn btn-add" style="background:var(--secondary)" onclick="añadirIngrediente('manual')">Añadir / Actualizar</button>
         </div>
 
         <div class="table-container">
             <table>
                 <thead>
-                    <tr><th>Ingrediente</th><th>Peso</th><th>Kcal</th><th>Prot</th><th>HC</th><th>Fibra</th><th>IA</th><th>Acción</th></tr>
+                    <tr><th>Ingrediente</th><th>Peso</th><th>Kcal</th><th>Prot</th><th>HC</th><th>Grasa</th><th>IA</th><th>Acción</th></tr>
                 </thead>
                 <tbody id="lista"></tbody>
             </table>
         </div>
 
         <div class="dashboard">
-            <div class="stat-card" style="border-bottom: 4px solid var(--danger);"><label>Calorías</label><b id="tKcal">0</b></div>
-            <div class="stat-card" style="border-bottom: 4px solid var(--secondary);"><label>Proteínas</label><b id="tProt">0</b></div>
-            <div class="stat-card" style="border-bottom: 4px solid var(--primary);"><label>Carbohidratos</label><b id="tCarb">0</b></div>
-            <div class="stat-card" style="border-bottom: 4px solid var(--warning);"><label>Grasas</label><b id="tFat">0</b></div>
+            <div class="stat-card" style="border-bottom: 4px solid var(--danger);"><label>Kcal Receta</label><b id="tKcal">0</b></div>
+            <div class="stat-card" style="border-bottom: 4px solid var(--secondary);"><label>Prot Receta</label><b id="tProt">0</b></div>
+            <div class="stat-card" style="border-bottom: 4px solid var(--primary);"><label>HC Receta</label><b id="tCarb">0</b></div>
+            <div class="stat-card" style="border-bottom: 4px solid var(--warning);"><label>Grasa Receta</label><b id="tFat">0</b></div>
         </div>
 
         <div class="micro-info">
@@ -138,15 +137,16 @@
     </div>
 
     <div class="card portion-tool">
-        <div class="grid-form" style="grid-template-columns: 1fr 1fr;">
-            <div>
-                <label style="font-weight: 800; font-size: 0.8rem;">⚖️ CALCULAR PORCIÓN</label>
-                <input type="number" id="pesoPorcion" placeholder="Gramos a comer..." oninput="recalcPorcion()" style="margin-top: 8px;">
-            </div>
-            <div style="display: flex; gap: 8px;">
-                <div class="stat-card" style="flex: 1;"><label>Kcal Ración</label><b id="pKcal">0</b></div>
-                <div class="stat-card" style="flex: 1;"><label>Prot Ración</label><b id="pProt">0</b></div>
-            </div>
+        <div style="text-align: center; margin-bottom: 15px;">
+            <label style="font-weight: 800; font-size: 0.9rem;">⚖️ CALCULADORA DE PORCIÓN ESPECÍFICA</label>
+            <input type="number" id="pesoPorcion" placeholder="¿Cuántos gramos vas a comer?" oninput="recalcPorcion()" style="margin-top: 10px; max-width: 300px; display: block; margin-left: auto; margin-right: auto;">
+        </div>
+        
+        <div class="portion-grid">
+            <div class="stat-card"><label>Kcal Ración</label><b id="pKcal">0</b></div>
+            <div class="stat-card"><label>Prot Ración</label><b id="pProt">0</b></div>
+            <div class="stat-card"><label>HC Ración</label><b id="pCarb">0</b></div>
+            <div class="stat-card"><label>Grasa Ración</label><b id="pFat">0</b></div>
         </div>
     </div>
 
@@ -161,7 +161,7 @@ const GEMINI_KEY = "AIzaSyAEbLKd3RLmbJ2bV6LL4p-BbgY4ZhI0OVA";
 
 let recetaActual = { nombre: "", ingredientes: [], totales: {} };
 let historial = JSON.parse(localStorage.getItem('hist_v7')) || [];
-let editIdx = -1; // -1 = nuevo, >= 0 = editando
+let editIdx = -1;
 
 window.onload = () => { cargarBorrador(); renderHistorial(); };
 
@@ -170,10 +170,11 @@ function setMode(mode) {
     document.getElementById('formManual').classList.toggle('hidden', mode !== 'manual');
     document.getElementById('tabUsda').classList.toggle('active', mode === 'usda');
     document.getElementById('tabManual').classList.toggle('active', mode === 'manual');
-    if(mode === 'manual' && editIdx === -1) document.getElementById('btnConfirmManual').innerText = "Añadir Manual";
+    if(mode === 'manual' && editIdx === -1) {
+        document.getElementById('btnConfirmManual').innerText = "Añadir Manual";
+    }
 }
 
-// LÓGICA DE DATOS
 async function añadirIngrediente(tipo) {
     let nombre, peso, base;
 
@@ -210,7 +211,7 @@ async function añadirIngrediente(tipo) {
         iaStatus: "⏳", iaMotivo: ""
     };
 
-    if(editIdx > -1) { recetaActual.ingredientes[editIdx] = item; editIdx = -1; }
+    if(editIdx > -1) { recetaActual.ingredients[editIdx] = item; editIdx = -1; }
     else { recetaActual.ingredientes.push(item); }
 
     actualizarMesa();
@@ -244,10 +245,9 @@ async function validarIA(item) {
             recetaActual.ingredientes[i].iaMotivo = res.msg;
             actualizarMesa();
         }
-    } catch { /* Error silencioso */ }
+    } catch { }
 }
 
-// GESTIÓN DE INTERFAZ
 function actualizarMesa() {
     const lista = document.getElementById("lista");
     lista.innerHTML = "";
@@ -266,7 +266,7 @@ function actualizarMesa() {
             <td style="color:var(--danger)">${ing.calc.kcal.toFixed(0)}</td>
             <td style="color:var(--secondary)">${ing.calc.prot.toFixed(1)}</td>
             <td>${ing.calc.carb.toFixed(1)}</td>
-            <td style="color:var(--primary)">${ing.calc.fiber.toFixed(1)}</td>
+            <td>${ing.calc.fat.toFixed(1)}</td>
             <td>${iaIcon}</td>
             <td>
                 <button class="action-btn" onclick="prepararEdicion(${i})">✏️</button>
@@ -309,13 +309,23 @@ function borrarIngrediente(idx) {
 
 function recalcPorcion() {
     const p = parseFloat(document.getElementById("pesoPorcion").value);
-    if(!p || recetaActual.totales.weight === 0) return;
-    const ratio = p / recetaActual.totales.weight;
+    const totalW = recetaActual.totales.weight;
+    
+    if(!p || !totalW || totalW === 0) {
+        document.getElementById("pKcal").innerText = "0";
+        document.getElementById("pProt").innerText = "0";
+        document.getElementById("pCarb").innerText = "0";
+        document.getElementById("pFat").innerText = "0";
+        return;
+    }
+
+    const ratio = p / totalW;
     document.getElementById("pKcal").innerText = (recetaActual.totales.kcal * ratio).toFixed(0);
     document.getElementById("pProt").innerText = (recetaActual.totales.prot * ratio).toFixed(1) + "g";
+    document.getElementById("pCarb").innerText = (recetaActual.totales.carb * ratio).toFixed(1) + "g";
+    document.getElementById("pFat").innerText = (recetaActual.totales.fat * ratio).toFixed(1) + "g";
 }
 
-// PERSISTENCIA
 function guardarHistorial() {
     recetaActual.nombre = document.getElementById("nombreReceta").value || "Receta Nueva";
     const i = historial.findIndex(r => r.nombre === recetaActual.nombre);
